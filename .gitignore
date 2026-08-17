@@ -1,0 +1,9 @@
+# Each of these is its own independent git repo (separate upstream remotes),
+# not tracked as content here.
+/CHESS/
+/DAIL-SQL/
+/DeepEye-SQL/
+
+# Data dependencies copied in for decoupling -- data, not code; not versioned here.
+/data/
+/discovery_full.csv
