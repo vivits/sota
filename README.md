@@ -22,6 +22,13 @@ Repo locations:
 (`/export/scratch/tsang065/DeepEye-SQL` is also still reachable as a symlink to the path above —
 a compatibility shim for the session that did the original move; safe to remove, or ignore.)
 
+Each repo's local commits (all adaptation work: discovery-CSV integration, sglang/Qwen wiring,
+logging, path fixes) are pushed to a fork under the `sota` branch, since `master`/`main` on each
+fork mirrors upstream (which has since diverged):
+- DeepEye-SQL: https://github.com/vivits/DeepEye-SQL/tree/sota (upstream: [HKUSTDial/DeepEye-SQL](https://github.com/HKUSTDial/DeepEye-SQL))
+- DAIL-SQL: https://github.com/vivits/DAIL-SQL/tree/sota (upstream: [BeachWang/DAIL-SQL](https://github.com/BeachWang/DAIL-SQL))
+- CHESS: https://github.com/vivits/CHESS/tree/sota (upstream: [ShayanTalaei/CHESS](https://github.com/ShayanTalaei/CHESS))
+
 ---
 
 ## Environment setup
