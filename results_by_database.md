@@ -1,13 +1,23 @@
-# Results by BIRD database (DeepEye-SQL, DAIL-SQL)
+# Results by BIRD database (DeepEye-SQL, DAIL-SQL, CHESS)
 
 Full BIRD dev set, 1,534 questions, discovery-filtered schema, Qwen3.6-27B-FP8 (local sglang).
 Execution accuracy (EX) checks whether the predicted row set equals the gold row set, run against
-the live sqlite database (600s timeout for DeepEye-SQL, 30s for DAIL-SQL -- see sota/README.md;
-checked impact of this difference: <=0.13 percentage points, not a driver of the gaps below).
+the live sqlite database (600s timeout for DeepEye-SQL, 30s for DAIL-SQL and CHESS -- see
+sota/README.md; checked impact of this difference: <=0.13 percentage points, not a driver of the
+gaps below).
 Per-item correctness for DeepEye-SQL was not persisted by its own pipeline and was recomputed here
 via the same set(pred_rows) == set(gold_rows) comparison as runner/evaluation.py
 (DeepEye-SQL/runner/analyze_by_db.py); DAIL-SQL's numbers reuse its own already-computed
 by_db breakdown (runner_evaluate_bird.py) joined with STATS_MODEL's per-question latency/tokens.
+CHESS's numbers come from its own per-question `execution_accuracy` result (already
+set(pred_rows) == set(gold_rows) via src/database_utils/execution.py, 30s timeout) recorded in
+each `{qid}_{db}.json` output file, joined with per-question latency/token usage from
+`-llm_usage_stats.json`. CHESS is a multi-agent pipeline (keyword extraction, retrieval, candidate
+generation, revision, unit testing) that issues many LLM calls per question, so its latency and
+token counts are the sum across all of those calls, not a single round trip -- this run also hit
+134 request-timeout errors against the sglang server during generation, which inflates the
+per-question latency further (avg 5,595.9s/query vs. DeepEye-SQL's and DAIL-SQL's single- or
+few-call pipelines).
 
 ### DeepEye-SQL
 
@@ -42,4 +52,21 @@ by_db breakdown (runner_evaluate_bird.py) joined with STATS_MODEL's per-question
 | california_schools | 89 | 33 | 37.1% | 2.7 | 1,092 | 107 |
 | financial | 106 | 26 | 24.5% | 8.2 | 885 | 331 |
 | **Overall** | **1534** | **820** | **53.46%** | **3.0** | **969** | **118** |
+
+### CHESS
+
+| Database | N | Correct | EX | Avg latency (s) | Avg input tok | Avg output tok |
+|---|---:|---:|---:|---:|---:|---:|
+| superhero | 129 | 86 | 66.7% | 5135.2 | 102,791 | 9,430 |
+| european_football_2 | 129 | 78 | 60.5% | 6083.3 | 194,303 | 12,933 |
+| student_club | 158 | 94 | 59.5% | 5726.8 | 147,287 | 16,357 |
+| toxicology | 145 | 85 | 58.6% | 4948.0 | 149,691 | 16,087 |
+| california_schools | 89 | 51 | 57.3% | 4274.7 | 218,391 | 16,406 |
+| card_games | 191 | 109 | 57.1% | 5707.7 | 229,435 | 12,389 |
+| codebase_community | 186 | 97 | 52.2% | 5416.3 | 169,947 | 15,744 |
+| thrombosis_prediction | 163 | 81 | 49.7% | 6012.0 | 183,662 | 16,361 |
+| formula_1 | 174 | 86 | 49.4% | 5836.7 | 159,197 | 16,839 |
+| debit_card_specializing | 64 | 31 | 48.4% | 5723.1 | 136,202 | 17,068 |
+| financial | 106 | 37 | 34.9% | 6365.8 | 116,883 | 15,837 |
+| **Overall** | **1534** | **835** | **54.43%** | **5595.9** | **167,480** | **14,944** |
 
